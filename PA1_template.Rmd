@@ -1,25 +1,61 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
+author: "S. Schwarzbek"
+date: "Thursday, October 15, 2014"
 output: 
   html_document:
     keep_md: true
 ---
+### The Task
+Create a "literate programming" style document analyzing fitness steps count data. Many corporations are now providing these as fitness encourgement through contracts with "Virgin Health Miles" as one source.
 
 
-## Loading and preprocessing the data
+We make sure our environment has the expected tools.
 
-
-
-## What is mean total number of steps taken per day?
-
-
-
-## What is the average daily activity pattern?
-
-
-
-## Imputing missing values
+```{r}
+library(knitr)
+library(caret)
+```
 
 
 
-## Are there differences in activity patterns between weekdays and weekends?
+##Assignment
+
+### Loading and preprocessing the data
+Dataset: Activity monitoring data
+```{r}
+if( ! exists("Activity")) {
+  Activity <- read.csv("C:\\Users\\steve\\Desktop\\Coursera\\DataScience\\Reproducible\\activity.csv")
+  }
+```
+The variables included in this dataset are:  
+steps: Number of steps taking in a 5-minute interval (missing values are coded as NA )  
+date: The date on which the measurement was taken in YYYY-MM-DD format  
+interval: Identifier for the 5-minute interval in which measurement was taken  
+The dataset is stored in a comma-separated-value (CSV) file and there are a total of 17,568 observations in this dataset.
+```{r, echo=TRUE}
+summary(Activity)
+hist(Activity$steps)
+
+plot(Activity)
+plot(by(Activity$steps, Activity$date, sum, simplify=TRUE))
+plot(by(Activity$steps, Activity$interval, sum, simplify=TRUE))
+```
+
+
+### What is mean total number of steps taken per day?
+```{r, echo=TRUE}
+
+plot(by(Activity$steps, Activity$date, sum, simplify=TRUE))
+```
+
+
+### What is the average daily activity pattern?
+
+
+
+### Imputing missing values
+
+
+
+### Are there differences in activity patterns between weekdays and weekends?
