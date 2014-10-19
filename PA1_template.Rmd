@@ -1,13 +1,13 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
 author: "S. Schwarzbek"
-date: "Thursday, October 15, 2014"
+date: "Sunday, October 19, 2014"
 output: 
   html_document:
     keep_md: true
 ---
 ### The Task
-Create a "literate programming" style document analyzing fitness steps count data. Many corporations are now providing these as fitness encourgement through contracts with "Virgin Health Miles" for example.
+Create a "literate programming" style document analyzing fitness steps count data. Many corporations are now providing these as fitness encouragement through contracts with "Virgin Health Miles" for example.
 
 
 We make sure our environment has the expected tools.
@@ -38,10 +38,9 @@ summary(Activity)
 Activity$Time <- strptime(Activity$date,"%Y-%m-%d")
 Activity$Day <- weekdays(Activity$Time)
 hist(Activity$steps)
-hist(Activity$steps[Activity$steps > 50], main = "Steps > 50/interval")
 hist(Activity$steps[Activity$steps > 200], main = "Steps > 200/interval")
 ```
-
+We look at the data away from zero to see if there is structure.For this analysis, we'll consider teh entire case,and not just those intervals that have "deliberate activity." As we'll note later, many NA's are likely to be "inactive intervals," often sleep.
 ```{r aggregations}
 #plot(Activity[,c(1,4,3)])
 meanDay <- aggregate(Activity$points, list( Activity$interval), mean)
@@ -60,72 +59,36 @@ legend("topleft", c("Mean", "Median"), col = c("blue", "green"), cex = 0.4)
 Activity$points <- Activity$steps
 Activity$points[is.na(Activity$steps)] <- 0
 
-#plot(by(Activity$points, Activity$interval, sum, simplify=TRUE))
-plot(by(Activity$points, Activity$interval, max, simplify=TRUE))
-#points(by(Activity$points, Activity$interval, min, na.rm = TRUE), col="blue"))
-#points(by(Activity$points, Activity$interval, mean, na.rm = TRUE), col="red"))
-#points(by(Activity$points, Activity$interval, median, na.rm = TRUE), col="green"))
+
 ```
 
 
 ### What is mean total number of steps taken per day?
-
-
-### What is the average daily activity pattern?
-```{r, echo=TRUE}
-
-plot(by(Activity$points, Activity$date, mean, simplify=TRUE))
+```{r meanPerDay}
+meanPerDay <- aggregate(Activity$points, list(Activity$Day), mean)
+plot(meanPerDay$x)
 ```
 
+### What is the average daily activity pattern?
+```{r daily, echo=TRUE}
+#mDay <- aggregate(Activity$points, list(Activity$intrval), mean)
+#plot(mDay$x)
 
+```
+
+Most of the early intervals are NA or small values. If we assume that our intervals start at midnight, the subject is ikely sleeping. Note that the weekend/weekday charts indicate "sleeping in" occurs regularly.
 
 
 
 
 ### Imputing missing values
-One of the first possibilities for the treatment of NA values is "No Activity," likely the fitness device not worn, inoperable, or has an overflow condition. We will count these intervals as stpes = 0, but retain the original columns also
-```{r, echo=TRUE}
+One of the first possibilities for the treatment of NA values is "No Activity," likely the fitness device not worn, inoperable, or has an overflow condition. We will count these intervals as steps = 0, but retain the original columns also
+This lowers the mean and median.
+```{r impute, echo=TRUE}
 Activity$points <- Activity$steps
 Activity$points[is.na(Activity$steps)] <- 0
 summary(Activity)
 ```
-
-
-### Are there differences in activity patterns between weekdays and weekends?
-boxplot(Activity$interval ~ Activity$points, pch=".", col = "blue", factor) 
-plot()
-
-# From the Readme:
-### What is mean total number of steps taken per day?
-
-For this part of the assignment, you can ignore the missing values in
-the dataset.
-
-1. Make a histogram of the total number of steps taken each day
-
-2. Calculate and report the **mean** and **median** total number of steps taken per day
-
-
-### What is the average daily activity pattern?
-
-1. Make a time series plot (i.e. `type = "l"`) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
-
-2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
-
-
-### Imputing missing values
-
-Note that there are a number of days/intervals where there are missing
-values (coded as `NA`). The presence of missing days may introduce
-bias into some calculations or summaries of the data.
-
-1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with `NA`s)
-
-2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
-
-3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
-
-4. Make a histogram of the total number of steps taken each day and Calculate and report the **mean** and **median** total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
 
 ### Are there differences in activity patterns between weekdays and weekends?
@@ -143,13 +106,6 @@ xyplot(Activity$points ~ Activity$interval | c(Activity$Day == "Saturday" | Acti
        main = "Lattice style, Weekend =?",
       )
 ```
-For this part the `weekdays()` function may be of some help here. Use
-the dataset with the filled-in missing values for this part.
 
-1. Create a new factor variable in the dataset with two levels -- "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
-
-1. Make a panel plot containing a time series plot (i.e. `type = "l"`) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). The plot should look something like the following, which was created using **simulated data**:
-
-![Sample panel plot](instructions_fig/sample_panelplot.png) 
 
 
